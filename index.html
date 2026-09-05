@@ -45,13 +45,15 @@ svg{display:block}
 <header><h1 id="hd">간밤 브리핑</h1><div class="ts"><span class="dot"></span><span id="ts">불러오는 중…</span></div></header>
 <div id="app"></div>
 <div class="note">
-<b>무엇인가.</b> 간밤 미국 반도체 지표(SOXL·KORU·마이크론·샌디스크)의 등락을 넣어 다음 한국 거래일의
-시가 갭을 계산합니다. 2025년 2월부터의 일봉으로 최소제곱 회귀를 씁니다.<br><br>
+<b>무엇인가.</b> 간밤 미국 반도체 지표(SOXL·KORU·마이크론·샌디스크)의 등락을 넣어
+<b>다음 한국 거래일의 시가</b>를 계산합니다. 추정하는 것은 <b>코스피·삼성전자·SK하이닉스 세 가지의 장 시작 가격뿐</b>이고,
+나머지 지표는 추정 없이 종가를 그대로 싣습니다.<br><br>
 <b>성적은 전진검증입니다.</b> 그날까지의 자료만으로 학습해 그 다음 날을 맞혀 본 결과만 싣습니다.
-표본내 성적은 쓰지 않습니다. 확률은 잔차 분포로 환산했고, 아래 보정표로 그 확률이 실제로 맞는지 확인할 수 있습니다.<br><br>
-<b>한계.</b> 「추정 야간선물」은 실제 체결가가 아니라 위 모델이 계산한 값입니다. 회귀는 극단을 보수적으로
-줄이므로 큰 폭의 밤에는 실제보다 작게 나옵니다. 실적 발표·환율 급변·정책 뉴스처럼 간밤 지표에 없는 사건은
-모델이 모릅니다. 자료는 몇 분 간격으로 갱신되며 실시간 체결가가 아닙니다.<br><br>
+표본내 성적은 쓰지 않습니다. 확률은 잔차 분포로 환산했고, 아래 보정표로 그 확률이 실제로 맞는지 확인할 수 있습니다.
+「범위」는 ±1σ로, 예상이 이 안에 들어올 확률이 약 3분의 2라는 뜻입니다.<br><br>
+<b>한계.</b> 회귀는 극단을 보수적으로 줄이므로 크게 움직인 밤에는 실제보다 작게 나옵니다.
+실적 발표·환율 급변·정책 뉴스처럼 간밤 지표에 없는 사건은 모델이 모릅니다.
+자료는 몇 분 간격으로 갱신되며 실시간 체결가가 아닙니다.<br><br>
 <b>투자 권유가 아닙니다.</b> 개인이 공부하려고 만든 통계 자료이며 특정 종목의 매매를 권하지 않습니다.
 투자 판단과 그 결과는 투자자 본인에게 귀속됩니다.
 </div></div>
@@ -68,25 +70,26 @@ function sp(ys,up){
  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" preserveAspectRatio="none">'
   +'<polyline points="'+pt+'" fill="none" stroke="'+(up?'var(--up)':'var(--dn)')+'" stroke-width="2" stroke-linejoin="round"/></svg>';
 }
-function dt(s){var p=s.split('-');return p[1]*1+'월 '+p[2]*1+'일';}
+function dt(s){var p=s.split('-'),W='일월화수목금토';
+ var d=new Date(+p[0],p[1]-1,+p[2]);return (p[1]*1)+'월 '+(p[2]*1)+'일('+W[d.getDay()]+')';}
 function render(d){
- document.getElementById('hd').textContent=dt(d.session)+' 개장 예상';
+ document.getElementById('hd').textContent=dt(d.session)+' 장 시작 예상';
  document.getElementById('ts').textContent=d.ts+' 기준';
- var h='',nf=d.nightFut;
- if(nf){h+='<div class="hero"><div class="lb">코스피200 <b>추정</b> 야간선물</div>'
-  +'<div class="v '+cl(nf.pct)+'">'+F(nf.est)+'</div>'
-  +'<div class="s '+cl(nf.pct)+'">'+pc(nf.pct)+' · 주간 종가 '+F(nf.day)+'</div></div>';}
- h+='<h2>개장 예상</h2><div class="g3">';
- ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){
+ var T=['코스피','삼성전자','SK하이닉스'],h='';
+ h+='<h2>장 시작 예상 <span style="font-weight:400">('+dt(d.session)+' 시가)</span></h2><div class="g3">';
+ T.forEach(function(n){
   var f=d.fc[n],s=d.score[n];if(!f)return;
-  h+='<div class="c"><div class="t">'+(n==='코스피200선물'?'코스피200':n)+'</div>'
-   +'<div class="v '+cl(f.gap)+'">'+pc(f.gap)+'</div>'
-   +'<div class="p">상승확률 '+Math.round(f.gapProb)+'%</div>'
+  var dec=(n==='코스피')?2:0;
+  h+='<div class="c"><div class="t">'+n+'</div>'
+   +'<div class="v" style="font-size:24px">'+F(f.openEst,dec)+'</div>'
+   +'<div class="p '+cl(f.gap)+'">'+pc(f.gap)+' · 상승확률 '+Math.round(f.gapProb)+'%</div>'
    +'<div class="bar"><i style="width:'+Math.max(0,Math.min(100,f.gapProb))+'%"></i></div>'
-   +'<div class="t" style="margin-top:6px">적중 '+s.hit.toFixed(0)+'% · 오차 '+s.mae.toFixed(1)+'%p</div></div>';
+   +'<div class="t" style="margin-top:7px;line-height:1.5">'
+   +'직전 종가 '+F(f.prev,dec)+'<br>범위 '+F(f.lo,dec)+' ~ '+F(f.hi,dec)
+   +'<br>적중 '+s.hit.toFixed(0)+'% · 오차 '+s.mae.toFixed(1)+'%p</div></div>';
  });
  h+='</div>';
- h+='<h2>밤새 움직이는 지표 <span style="font-weight:400">(CME, 10분 지연)</span></h2><div class="g3">';
+ h+='<h2>간밤 지표 <span style="font-weight:400">(추정 없이 종가 그대로)</span></h2><div class="g3">';
  d.night.forEach(function(u){h+='<div class="c"><div class="t">'+u.label+'</div><div class="v">'+K(u.price)
   +'</div><div class="p '+cl(u.changePct)+'">'+pc(u.changePct)+'</div></div>';});
  h+='</div>';
@@ -98,24 +101,23 @@ function render(d){
    +sp(u.spark,u.changePct>=0)+'</div>';});
  h+='</div>';
  if(CP){
-  h+='<div class="note" style="margin-top:14px">이 예상의 <b>전진검증 방향 적중률</b>은 코스피200 '
-   +d.score['코스피200선물'].hit.toFixed(0)+'%, 삼성전자 '+d.score['삼성전자'].hit.toFixed(0)
+  h+='<div class="note" style="margin-top:14px">이 예상의 <b>전진검증 방향 적중률</b>은 코스피 '
+   +d.score['코스피'].hit.toFixed(0)+'%, 삼성전자 '+d.score['삼성전자'].hit.toFixed(0)
    +'%, SK하이닉스 '+d.score['SK하이닉스'].hit.toFixed(0)+'% 입니다. '
    +'<a href="https://nataws88-ui.github.io/night/" target="_blank" rel="noopener"><b>성적표·확률 보정표 전체 보기 →</b></a><br>'
    +'투자 권유가 아닙니다. 투자 판단과 결과는 투자자 본인에게 귀속됩니다.</div>';
   document.getElementById('app').innerHTML=h; return;
  }
  h+='<h2>이 예상은 그동안 얼마나 맞았나</h2><table><tr><th>대상</th><th>방향 적중</th><th>그냥 찍었을 때</th><th>평균 오차</th><th>표본외 R²</th></tr>';
- ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){var s=d.score[n];if(!s)return;
-  h+='<tr><td>'+(n==='코스피200선물'?'코스피200':n)+' 시가 갭</td><td><b>'+s.hit.toFixed(1)+'%</b></td><td>'
-   +s.base.toFixed(1)+'%</td><td>'+s.mae.toFixed(2)+'%p</td><td>'+(s.r2>0?'+':'')+s.r2.toFixed(2)+'</td></tr>';});
+ T.forEach(function(n){var s=d.score[n];if(!s)return;
+  h+='<tr><td>'+n+' 시가</td><td><b>'+s.hit.toFixed(1)+'%</b></td><td>'+s.base.toFixed(1)
+   +'%</td><td>'+s.mae.toFixed(2)+'%p</td><td>'+(s.r2>0?'+':'')+s.r2.toFixed(2)+'</td></tr>';});
  h+='</table>';
- h+='<h2>말한 확률이 진짜 그 확률인가</h2><table><tr><th>예상 확률</th><th>코스피200</th><th>삼성전자</th><th>SK하이닉스</th></tr>';
- var bs={};['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){Object.keys(d.calib[n]||{}).forEach(function(b){bs[b]=1})});
+ h+='<h2>말한 확률이 진짜 그 확률인가</h2><table><tr><th>예상 확률</th><th>코스피</th><th>삼성전자</th><th>SK하이닉스</th></tr>';
+ var bs={};T.forEach(function(n){Object.keys(d.calib[n]||{}).forEach(function(b){bs[b]=1})});
  Object.keys(bs).sort(function(a,b){return a-b}).forEach(function(b){
   h+='<tr><td>'+(b*10)+'~'+(b*10+10)+'%</td>';
-  ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){
-   var v=(d.calib[n]||{})[b];
+  T.forEach(function(n){var v=(d.calib[n]||{})[b];
    h+='<td>'+(v?v[0].toFixed(0)+'% <span class="t">('+v[1]+'일)</span>':'—')+'</td>';});
   h+='</tr>';});
  h+='</table>';
