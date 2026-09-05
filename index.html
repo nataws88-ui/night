@@ -113,7 +113,10 @@ function render(d){
  document.getElementById('app').innerHTML=h;
 }
 function load(){
- fetch('data.json?t='+Math.floor(Date.now()/60000),{cache:'no-store'})
+ // 자료는 data 브랜치에 있다 — Pages 빌드를 안 타고(시간당 10회 제한 회피)
+ // raw 는 CORS 를 열어 준다(Access-Control-Allow-Origin: *, 5분 캐시).
+ var U='https://raw.githubusercontent.com/nataws88-ui/night/data/data.json';
+ fetch(U+'?t='+Math.floor(Date.now()/300000),{cache:'no-store'})
   .then(function(r){return r.json()}).then(render)
   .catch(function(){document.getElementById('ts').textContent='자료를 불러오지 못했습니다'});
 }
