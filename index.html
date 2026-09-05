@@ -56,6 +56,7 @@ svg{display:block}
 투자 판단과 그 결과는 투자자 본인에게 귀속됩니다.
 </div></div>
 <script>
+var CP=/[?&]compact=1/.test(location.search);
 var F=function(v,d){return v==null?'—':v.toLocaleString('ko-KR',{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d})};
 var K=function(v){return v==null?'—':Math.round(v).toLocaleString('ko-KR')};
 function pc(v){return v==null?'—':(v>0?'+':'')+v.toFixed(2)+'%'}
@@ -96,6 +97,14 @@ function render(d){
    +(u.rank!=null?' <span class="t">· 과거 상위 '+(100-u.rank).toFixed(0)+'%</span>':'')+'</div>'
    +sp(u.spark,u.changePct>=0)+'</div>';});
  h+='</div>';
+ if(CP){
+  h+='<div class="note" style="margin-top:14px">이 예상의 <b>전진검증 방향 적중률</b>은 코스피200 '
+   +d.score['코스피200선물'].hit.toFixed(0)+'%, 삼성전자 '+d.score['삼성전자'].hit.toFixed(0)
+   +'%, SK하이닉스 '+d.score['SK하이닉스'].hit.toFixed(0)+'% 입니다. '
+   +'<a href="https://nataws88-ui.github.io/night/" target="_blank" rel="noopener"><b>성적표·확률 보정표 전체 보기 →</b></a><br>'
+   +'투자 권유가 아닙니다. 투자 판단과 결과는 투자자 본인에게 귀속됩니다.</div>';
+  document.getElementById('app').innerHTML=h; return;
+ }
  h+='<h2>이 예상은 그동안 얼마나 맞았나</h2><table><tr><th>대상</th><th>방향 적중</th><th>그냥 찍었을 때</th><th>평균 오차</th><th>표본외 R²</th></tr>';
  ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){var s=d.score[n];if(!s)return;
   h+='<tr><td>'+(n==='코스피200선물'?'코스피200':n)+' 시가 갭</td><td><b>'+s.hit.toFixed(1)+'%</b></td><td>'
@@ -120,5 +129,7 @@ function load(){
   .then(function(r){return r.json()}).then(render)
   .catch(function(){document.getElementById('ts').textContent='자료를 불러오지 못했습니다'});
 }
+if(CP){var n=document.querySelectorAll('.w>.note');for(var i=0;i<n.length;i++)n[i].style.display='none';
+ document.querySelector('.w').style.padding='10px 12px 14px';}
 load();setInterval(load,60000);
 </script></body></html>
