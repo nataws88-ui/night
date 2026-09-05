@@ -1,0 +1,121 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>간밤 브리핑 — 개장 전 반도체 지표</title>
+<meta name="description" content="간밤 미국 반도체 지표로 계산한 코스피200·삼성전자·SK하이닉스 개장 예상. 전진검증으로 잰 적중률을 함께 공개합니다.">
+<style>
+:root{color-scheme:light dark;
+ --bg:#fff;--card:#fbfbfc;--line:#e6e8ec;--tx:#16181d;--mut:#6b7280;--up:#e5484d;--dn:#3b82f6;--acc:#f5a524}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#171a21;--line:#252a34;--tx:#e9ecf1;--mut:#8b93a3}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-size:16px;line-height:1.6;
+ font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.w{max-width:720px;margin:0 auto;padding:16px 14px 28px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;
+ border-bottom:2px solid var(--tx);padding-bottom:10px;margin-bottom:14px}
+h1{font-size:19px;margin:0;font-weight:800;letter-spacing:-.02em}
+.ts{font-size:11.5px;color:var(--mut);font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:4px;animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+h2{font-size:14px;margin:22px 0 8px;font-weight:800;color:var(--mut);letter-spacing:.02em}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
+.hero .lb{font-size:12.5px;color:var(--mut)}
+.hero .v{font-size:38px;font-weight:800;letter-spacing:-.035em;line-height:1.1;margin:2px 0;
+ font-variant-numeric:tabular-nums}
+.hero .s{font-size:14px;color:var(--mut);margin-top:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.c{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px}
+.c .t{font-size:12px;color:var(--mut);font-weight:700}
+.c .v{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
+.c .p{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.star{color:var(--acc);font-size:10px;vertical-align:super}
+.bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--up);transition:width .6s}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-size:12px;font-weight:700}
+.note{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:13px;
+ padding:12px 13px;font-size:12px;color:var(--mut);line-height:1.75}
+.note b{color:var(--tx)}
+svg{display:block}
+@media(max-width:480px){.g2,.g3{grid-template-columns:1fr 1fr}.hero .v{font-size:32px}}
+</style></head><body><div class="w">
+<header><h1 id="hd">간밤 브리핑</h1><div class="ts"><span class="dot"></span><span id="ts">불러오는 중…</span></div></header>
+<div id="app"></div>
+<div class="note">
+<b>무엇인가.</b> 간밤 미국 반도체 지표(SOXL·KORU·마이크론·샌디스크)의 등락을 넣어 다음 한국 거래일의
+시가 갭을 계산합니다. 2025년 2월부터의 일봉으로 최소제곱 회귀를 씁니다.<br><br>
+<b>성적은 전진검증입니다.</b> 그날까지의 자료만으로 학습해 그 다음 날을 맞혀 본 결과만 싣습니다.
+표본내 성적은 쓰지 않습니다. 확률은 잔차 분포로 환산했고, 아래 보정표로 그 확률이 실제로 맞는지 확인할 수 있습니다.<br><br>
+<b>한계.</b> 「추정 야간선물」은 실제 체결가가 아니라 위 모델이 계산한 값입니다. 회귀는 극단을 보수적으로
+줄이므로 큰 폭의 밤에는 실제보다 작게 나옵니다. 실적 발표·환율 급변·정책 뉴스처럼 간밤 지표에 없는 사건은
+모델이 모릅니다. 자료는 몇 분 간격으로 갱신되며 실시간 체결가가 아닙니다.<br><br>
+<b>투자 권유가 아닙니다.</b> 개인이 공부하려고 만든 통계 자료이며 특정 종목의 매매를 권하지 않습니다.
+투자 판단과 그 결과는 투자자 본인에게 귀속됩니다.
+</div></div>
+<script>
+var F=function(v,d){return v==null?'—':v.toLocaleString('ko-KR',{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d})};
+var K=function(v){return v==null?'—':Math.round(v).toLocaleString('ko-KR')};
+function pc(v){return v==null?'—':(v>0?'+':'')+v.toFixed(2)+'%'}
+function cl(v){return v==null?'fl':(v>0?'up':(v<0?'dn':'fl'))}
+function sp(ys,up){
+ if(!ys||ys.length<2)return '';
+ var W=300,H=44,P=3,lo=Math.min.apply(null,ys),hi=Math.max.apply(null,ys),rg=(hi-lo)||1,st=(W-P*2)/(ys.length-1);
+ var pt=ys.map(function(v,i){return (P+i*st).toFixed(1)+','+(P+(H-P*2)*(1-(v-lo)/rg)).toFixed(1)}).join(' ');
+ return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" preserveAspectRatio="none">'
+  +'<polyline points="'+pt+'" fill="none" stroke="'+(up?'var(--up)':'var(--dn)')+'" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+function dt(s){var p=s.split('-');return p[1]*1+'월 '+p[2]*1+'일';}
+function render(d){
+ document.getElementById('hd').textContent=dt(d.session)+' 개장 예상';
+ document.getElementById('ts').textContent=d.ts+' 기준';
+ var h='',nf=d.nightFut;
+ if(nf){h+='<div class="hero"><div class="lb">코스피200 <b>추정</b> 야간선물</div>'
+  +'<div class="v '+cl(nf.pct)+'">'+F(nf.est)+'</div>'
+  +'<div class="s '+cl(nf.pct)+'">'+pc(nf.pct)+' · 주간 종가 '+F(nf.day)+'</div></div>';}
+ h+='<h2>개장 예상</h2><div class="g3">';
+ ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){
+  var f=d.fc[n],s=d.score[n];if(!f)return;
+  h+='<div class="c"><div class="t">'+(n==='코스피200선물'?'코스피200':n)+'</div>'
+   +'<div class="v '+cl(f.gap)+'">'+pc(f.gap)+'</div>'
+   +'<div class="p">상승확률 '+Math.round(f.gapProb)+'%</div>'
+   +'<div class="bar"><i style="width:'+Math.max(0,Math.min(100,f.gapProb))+'%"></i></div>'
+   +'<div class="t" style="margin-top:6px">적중 '+s.hit.toFixed(0)+'% · 오차 '+s.mae.toFixed(1)+'%p</div></div>';
+ });
+ h+='</div>';
+ h+='<h2>밤새 움직이는 지표 <span style="font-weight:400">(CME, 10분 지연)</span></h2><div class="g3">';
+ d.night.forEach(function(u){h+='<div class="c"><div class="t">'+u.label+'</div><div class="v">'+K(u.price)
+  +'</div><div class="p '+cl(u.changePct)+'">'+pc(u.changePct)+'</div></div>';});
+ h+='</div>';
+ h+='<h2>간밤 미국 마감 <span style="font-weight:400">(<span class="star">★</span> = 예상 계산에 쓰는 것)</span></h2><div class="g2">';
+ d.closed.forEach(function(u){
+  h+='<div class="c"><div class="t">'+u.label+(u.input?' <span class="star">★</span>':'')+'</div>'
+   +'<div class="v">'+F(u.price)+'</div><div class="p '+cl(u.changePct)+'">'+pc(u.changePct)
+   +(u.rank!=null?' <span class="t">· 과거 상위 '+(100-u.rank).toFixed(0)+'%</span>':'')+'</div>'
+   +sp(u.spark,u.changePct>=0)+'</div>';});
+ h+='</div>';
+ h+='<h2>이 예상은 그동안 얼마나 맞았나</h2><table><tr><th>대상</th><th>방향 적중</th><th>그냥 찍었을 때</th><th>평균 오차</th><th>표본외 R²</th></tr>';
+ ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){var s=d.score[n];if(!s)return;
+  h+='<tr><td>'+(n==='코스피200선물'?'코스피200':n)+' 시가 갭</td><td><b>'+s.hit.toFixed(1)+'%</b></td><td>'
+   +s.base.toFixed(1)+'%</td><td>'+s.mae.toFixed(2)+'%p</td><td>'+(s.r2>0?'+':'')+s.r2.toFixed(2)+'</td></tr>';});
+ h+='</table>';
+ h+='<h2>말한 확률이 진짜 그 확률인가</h2><table><tr><th>예상 확률</th><th>코스피200</th><th>삼성전자</th><th>SK하이닉스</th></tr>';
+ var bs={};['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){Object.keys(d.calib[n]||{}).forEach(function(b){bs[b]=1})});
+ Object.keys(bs).sort(function(a,b){return a-b}).forEach(function(b){
+  h+='<tr><td>'+(b*10)+'~'+(b*10+10)+'%</td>';
+  ['코스피200선물','삼성전자','SK하이닉스'].forEach(function(n){
+   var v=(d.calib[n]||{})[b];
+   h+='<td>'+(v?v[0].toFixed(0)+'% <span class="t">('+v[1]+'일)</span>':'—')+'</td>';});
+  h+='</tr>';});
+ h+='</table>';
+ document.getElementById('app').innerHTML=h;
+}
+function load(){
+ fetch('data.json?t='+Math.floor(Date.now()/60000),{cache:'no-store'})
+  .then(function(r){return r.json()}).then(render)
+  .catch(function(){document.getElementById('ts').textContent='자료를 불러오지 못했습니다'});
+}
+load();setInterval(load,60000);
+</script></body></html>
