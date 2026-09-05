@@ -60,7 +60,10 @@ svg{display:block}
 <script>
 var CP=/[?&]compact=1/.test(location.search);
 var F=function(v,d){return v==null?'—':v.toLocaleString('ko-KR',{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d})};
-var K=function(v){return v==null?'—':Math.round(v).toLocaleString('ko-KR')};
+// 1만 미만은 소수 2자리를 살린다 (환율 1,349.50 · 선물 1,052.50 이 반올림돼 뭉개지면 안 된다)
+var K=function(v){return v==null?'—':(Math.abs(v)<10000
+  ? v.toLocaleString('ko-KR',{minimumFractionDigits:2,maximumFractionDigits:2})
+  : Math.round(v).toLocaleString('ko-KR'))};
 function pc(v){return v==null?'—':(v>0?'+':'')+v.toFixed(2)+'%'}
 function cl(v){return v==null?'fl':(v>0?'up':(v<0?'dn':'fl'))}
 function sp(ys,up){
