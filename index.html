@@ -76,9 +76,13 @@ function sp(ys,up){
 function dt(s){var p=s.split('-'),W='일월화수목금토';
  var d=new Date(+p[0],p[1]-1,+p[2]);return (p[1]*1)+'월 '+(p[2]*1)+'일('+W[d.getDay()]+')';}
 function render(d){
+ var h0='';
  document.getElementById('hd').textContent=dt(d.session)+(d.usStale?' 장 시작':' 장 시작 예상');
  document.getElementById('ts').textContent=d.ts+' 기준'+(PIN?' · 보관본':'');
- var T=['코스피','삼성전자','SK하이닉스'],h='';
+ if(FELL){h0='<div class="note" style="margin:0 0 12px;border-left:3px solid var(--dn);padding-left:10px">'
+   +'<b>'+FELL.slice(0,4)+'-'+FELL.slice(4,6)+'-'+FELL.slice(6)+' 보관본을 찾지 못했습니다.</b><br>'
+   +'아래는 그날 값이 아니라 <b>가장 최근 자료</b>입니다 — 이 글의 본문 숫자와 다를 수 있습니다.</div>';}
+ var T=['코스피','삼성전자','SK하이닉스'],h=h0||'';
  if(d.usStale){h+='<div class="note" style="margin:0 0 12px;border-left:3px solid var(--dn);padding-left:10px">'
   +'<b>오늘은 예상을 내지 않습니다.</b><br>'+(d.staleNote||'')+'</div>';}
  h+='<h2>'+(d.usStale?'직전 종가 <span style="font-weight:400">(예상 없음)</span>'
@@ -140,7 +144,7 @@ function render(d){
  document.getElementById('app').innerHTML=h;
 }
 // ?d=YYYYMMDD 가 붙으면 그날 스냅샷을 읽는다(티스토리 옛 글이 계속 그날 값을 보이도록).
-var PIN=(location.search.match(/[?&]d=(\d{8})/)||[])[1]||'';
+var PIN=(location.search.match(/[?&]d=(\d{8})/)||[])[1]||'',FELL='';
 function load(){
  // 자료는 data 브랜치에 있다 — Pages 빌드를 안 타고(시간당 10회 제한 회피)
  // raw 는 CORS 를 열어 준다(Access-Control-Allow-Origin: *, 5분 캐시).
@@ -149,7 +153,9 @@ function load(){
  fetch(U+'?t='+Math.floor(Date.now()/300000),{cache:'no-store'})
   .then(function(r){if(!r.ok)throw 0;return r.json()}).then(render)
   .catch(function(){
-    if(PIN){PIN='';return load();}      // 스냅샷이 없으면 최신으로 되돌린다
+    // 스냅샷이 없으면 최신으로 되돌리되 «그 사실을 밝힌다».
+    // 예전엔 PIN 을 영구히 비워, 옛 글이 아무 표시 없이 오늘 숫자로 바뀌었다.
+    if(PIN&&!FELL){FELL=PIN;PIN='';return load();}
     document.getElementById('ts').textContent='자료를 불러오지 못했습니다';});
 }
 if(CP){var n=document.querySelectorAll('.w>.note');for(var i=0;i<n.length;i++)n[i].style.display='none';
