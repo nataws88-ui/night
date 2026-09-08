@@ -104,11 +104,12 @@ function render(d){
    +'<br>적중 '+s.hit.toFixed(0)+'% · 오차 '+s.mae.toFixed(1)+'%p</div></div>';
  });
  h+='</div>';
- h+='<h2>간밤 지표 <span style="font-weight:400">(추정 없이 종가 그대로)</span></h2><div class="g3">';
+ h+='<h2>'+(d.usStale?'현재 지표':'간밤 지표')+' <span style="font-weight:400">(추정 없이 종가 그대로)</span></h2><div class="g3">';
  d.night.forEach(function(u){h+='<div class="c"><div class="t">'+u.label+'</div><div class="v">'+K(u.price)
   +'</div><div class="p '+cl(u.changePct)+'">'+pc(u.changePct)+'</div></div>';});
  h+='</div>';
- h+='<h2>간밤 미국 마감 <span style="font-weight:400">(<span class="star">★</span> = 예상 계산에 쓰는 것)</span></h2><div class="g2">';
+ h+='<h2>'+(d.usStale?'직전 미국 마감 <span style="font-weight:400">(이미 반영된 값)</span>'
+   :'간밤 미국 마감 <span style="font-weight:400">(<span class="star">★</span> = 예상 계산에 쓰는 것)</span>')+'</h2><div class="g2">';
  d.closed.forEach(function(u){
   h+='<div class="c"><div class="t">'+u.label+(u.input?' <span class="star">★</span>':'')+'</div>'
    +'<div class="v">'+F(u.price)+'</div><div class="p '+cl(u.changePct)+'">'+pc(u.changePct)
